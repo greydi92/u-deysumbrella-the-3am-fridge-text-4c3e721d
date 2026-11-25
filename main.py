@@ -40,9 +40,15 @@ none copied from anywhere else):
   you want a snack?" (84 chars) Fresh texter conceit, weak punchline.
 
 The program is deterministic: it always writes the same chosen line.
+
+Before writing, it checks the line against the scorer's gate (1–140
+characters, a single line, not only whitespace) and exits non-zero if it
+ever fails, so a bad line can never be written silently. The output
+directory honours $MAKEFUN_OUTPUT_DIR, then $OUTPUT_DIR, then /output.
 """
 
 import os
+import sys
 
 ENTRY = (
     "3am. I have seen things no appliance should see. "
@@ -50,9 +56,27 @@ ENTRY = (
 )
 
 
+def output_dir() -> str:
+    return os.environ.get("MAKEFUN_OUTPUT_DIR") or os.environ.get("OUTPUT_DIR") or "/output"
+
+
+def validate(entry: str) -> None:
+    if not (1 <= len(entry) <= 140):
+        print(f"error: entry is {len(entry)} chars, gate requires 1-140", file=sys.stderr)
+        sys.exit(1)
+    if entry != entry.strip() or not entry.strip():
+        print("error: entry is empty or only whitespace", file=sys.stderr)
+        sys.exit(1)
+    if "\n" in entry or "\r" in entry:
+        print("error: entry must be a single line", file=sys.stderr)
+        sys.exit(1)
+
+
 def main() -> None:
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8", newline="") as f:
+    validate(ENTRY)
+    out = output_dir()
+    os.makedirs(out, exist_ok=True)
+    with open(os.path.join(out, "entry.txt"), "w", encoding="utf-8", newline="") as f:
         f.write(ENTRY)
 
 

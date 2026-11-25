@@ -23,6 +23,10 @@ Bounty: [The 3AM Fridge Text](https://make.fun/bounty/u-deysumbrella-the-3am-fri
 python3 main.py   # writes /output/entry.txt
 ```
 
+The output directory can be overridden with `$MAKEFUN_OUTPUT_DIR` (or
+`$OUTPUT_DIR`); `main.py` also checks the line against the scorer's gate
+(1–140 chars, single line) before writing and fails loudly otherwise.
+
 ## How it works
 
 `main.py` is deterministic: it writes the single chosen line (drafted and
